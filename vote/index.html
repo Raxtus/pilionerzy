@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="./style.css" type="text/css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="../server.js"></script>
+    <script>
+        function sendAnswer(ans) {
+            let sended = false;
+            if (!sended) { 
+                sended = true;
+                console.log(document.cookie)
+                document.getElementById(ans).setAttribute("style", "background-color:#6bbc0a");
+                $.ajax({
+                    url: 'https://pilio.t1s.pl/answer',
+                    type: 'POST',
+                    data: {
+                        answer: ans
+                    },
+                    success: function (result) {
+
+                        console.log(result)
+                        alert("Wysłano")
+                    }
+                    , error: function (error) {
+
+                        console.log(error)
+                        alert("błąd");
+                        sended = false
+                    }
+                });
+            }
+            else
+            {
+                alert("Oddano już odpowiedziano");
+            }
+        }
+            
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <div class="container">
+        <button id="a" onclick="sendAnswer('a')">A</button>
+        <button id="b" onclick="sendAnswer('b')">B</button>
+        <button id="c" onclick="sendAnswer('c')">C</button>
+        <button id="d" onclick="sendAnswer('d')">D</button>
+    </div>
+
+</body>
+
+</html>
