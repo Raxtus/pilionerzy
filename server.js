@@ -13,9 +13,11 @@ function postEliminationAnswer(name, answer) {
         success: function (result) {
 
             console.log(result);
+            alert("wysłano")
         }, error: function (error) {
 
             console.log(error);
+            alert(error);
 
         }
     });

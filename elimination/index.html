@@ -6,7 +6,14 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="../server.js"></script>
     <script>
-        let sended = false;
+        let ourStorage = window.localStorage;
+        //ourStorage.clear();
+        function compare(a1)
+        {
+            console.log("ah");
+             return new Date().getTime() - new Date(a1).getTime() > 60000;
+                        
+        }
         let timerInterval = setInterval(() => {
             $.ajax({
                 url: 'https://pilio.t1s.pl/eliminations',
@@ -17,7 +24,6 @@
                         document.getElementsByTagName("p")[0].innerHTML = result[0].name;
                         clearInterval(timerInterval);
                     }
-                    
 
                 }, error: function (error) {
 
@@ -29,14 +35,21 @@
 
         function sendAnswer() {
             
-            if (sended == false) {
-                sended = true;
+            if(ourStorage.length == 0 || compare(ourStorage.getItem("sended"))) {
+                ourStorage.setItem("sended",new Date());  
+                document.getElementsByTagName('button')[0].setAttribute("style", "background-color:#6bbc0a");             
                 ans = document.getElementById("ans");
                 let data = new FormData(ans);
                 console.log(data.get("name"));
                 console.log(data.get("odp"));
                 postEliminationAnswer(data.get("name"), data.get("odp"));
-                document.getElementsByTagName('button')[0].setAttribute("style", "background-color:#6bbc0a");
+                setTimeout(function() {
+                    document.getElementsByTagName('button')[0].removeAttribute("style"); 
+                }, 60000)
+            }
+            else
+            {
+                alert("Oddano już odpowiedź");
             }
         }
 

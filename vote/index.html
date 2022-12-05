@@ -6,11 +6,18 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="../server.js"></script>
     <script>
+        let ourStorage = window.localStorage;
+        //ourStorage.clear();
+        function compare(a1)
+        {
+            console.log("ah");
+             return new Date().getTime() - new Date(a1).getTime() > 60000;
+                        
+        }
         function sendAnswer(ans) {
-            let sended = false;
-            if (!sended) { 
-                sended = true;
-                console.log(document.cookie)
+            
+           if(ourStorage.length == 0 || compare(ourStorage.getItem("sended"))) { 
+                ourStorage.setItem("sended",new Date());
                 document.getElementById(ans).setAttribute("style", "background-color:#6bbc0a");
                 $.ajax({
                     url: 'https://pilio.t1s.pl/answer',
@@ -25,18 +32,20 @@
                     }
                     , error: function (error) {
 
-                        console.log(error)
                         alert("błąd");
-                        sended = false
+                        ourStorage.clear();
                     }
                 });
+                setTimeout(function () {
+                 ourStorage.clear();
+                 window.location.reload(false);
+                },30000);
             }
             else
             {
-                alert("Oddano już odpowiedziano");
+                alert("Oddano już odpowiedź");
             }
-        }
-            
+        }            
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
