@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="./style.css" type="text/css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="../server.js"></script>
+    <script>
+        let sended = false;
+        let timerInterval = setInterval(() => {
+            $.ajax({
+                url: 'https://pilio.t1s.pl/eliminations',
+                type: 'GET',
+                success: function (result) {
+                    console.log(result);
+                    if (result.length !=0) {
+                        document.getElementsByTagName("p")[0].innerHTML = result[0].name;
+                        clearInterval(timerInterval);
+                    }
+                    
+
+                }, error: function (error) {
+
+                    console.log(error)
+
+                }
+            });
+        }, 500);
+
+        function sendAnswer() {
+            
+            if (sended == false) {
+                sended = true;
+                ans = document.getElementById("ans");
+                let data = new FormData(ans);
+                console.log(data.get("name"));
+                console.log(data.get("odp"));
+                postEliminationAnswer(data.get("name"), data.get("odp"));
+                document.getElementsByTagName('button')[0].setAttribute("style", "background-color:#6bbc0a");
+            }
+        }
+
+
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <div class="container">
+        <p>
+
+        </p>
+        <form id="ans">
+            <div class="row">
+                <div class="col">
+                    <label for="name">Imię Nazwisko</label>
+                </div>
+                <div class="col">
+                    <input type="text" id="name" name="name" placeholder="Imie Nazwisko...">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="odp">Odpowiedź</label>
+                </div>
+                <div class="col">
+                    <input type="text" id="odp" name="odp" placeholder="Odpowiedź...">
+                </div>
+            </div>
+
+        </form>
+        <div class="row">
+            <button onclick="sendAnswer()">Wyślij</button>
+        </div>
+    </div>
+
+</body>
+
+</html>
