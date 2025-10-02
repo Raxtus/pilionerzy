@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link href="./style.css" type="text/css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="./script.js"></script>
+    <script>
+        let ourStorage = window.localStorage;
+
+        function compare(a1) {
+            console.log("ah");
+            return new Date().getTime() - new Date(a1).getTime() > 60000;
+
+        }
+        function sendAnswer(ans) {
+
+            if (ourStorage.length == 0 || compare(ourStorage.getItem("sended"))) {
+                ourStorage.setItem("sended", new Date());
+                document.getElementById(ans).setAttribute("style", "background-color:#6bbc0a");
+                $.ajax({
+                    url: 'https://api.raxtus.net/vote',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        ans: ans
+                    }),
+                    success: function (result) {
+
+                        console.log(result);
+                        alert("Wysłano");
+                    }
+                    , error: function (error) {
+
+                        alert(error);
+                        ourStorage.clear();
+                    }
+                });
+                setTimeout(function () {
+                    ourStorage.clear();
+                    window.location.reload(false);
+                }, 60000);
+            }
+            else {
+                alert("Oddano już odpowiedź");
+            }
+        }            
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <div class="container">
+        <button id="a" onclick="sendAnswer('a')">A</button>
+        <button id="b" onclick="sendAnswer('b')">B</button>
+        <button id="c" onclick="sendAnswer('c')">C</button>
+        <button id="d" onclick="sendAnswer('d')">D</button>
+    </div>
+
+</body>
+
+</html>
