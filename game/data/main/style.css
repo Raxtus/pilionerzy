@@ -1,0 +1,57 @@
+body {
+	background-color: rgba(38, 21, 65, 1);
+	left: 50%;
+}
+
+#logo {
+
+	margin-left: 50%;
+	width: 678px;
+	height: 433px;
+	transform: translateX(-50%);
+}
+
+.runda {
+	text-align: center;
+	width: 450px;
+	height: 75px;
+	line-height: 50px;
+	transform: translateX(-50%);
+	margin-left: 50%;
+	padding-top: 5px;
+
+}
+
+svg {
+	fill: url(#blue);
+}
+
+svg:hover {
+	fill: url(#yellow);
+}
+
+text {
+	dominant-baseline: middle;
+	text-anchor: middle;
+	fill: white;
+	font-size: 64px;
+}
+
+.buttonText {
+	color: rgba(255, 255, 255, 1);
+	font-size: 30px;
+	vertical-align: middle;
+	line-height: normal;
+}
+
+#musicButton {
+	border-width: 1px;
+	border-color: rgba(255, 255, 255, 1);
+	background-color: rgba(38, 21, 65, 0.768627450980392);
+	position: absolute;
+	left: 358px;
+	top: 198px;
+	width: 17px;
+	height: 10px;
+	display: flex;
+}

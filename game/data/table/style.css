@@ -1,0 +1,33 @@
+body
+{
+    background-color:rgba(38, 21, 65, 1);
+}
+svg
+{
+	fill:url(#blue);
+    width:100%;
+    height:100%;
+}
+text
+{
+    dominant-baseline:middle;
+	fill:white;
+	font-size:58px;
+    filter: url(#shadow);
+}
+.person
+{
+    width:800px;
+    height: 100px;
+    margin: 10px;
+    float: left;
+}
+.person svg
+{
+    width: 800px;
+    height: 100px;
+}
+.correct
+{
+    fill:url(#yellow)
+}

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Round 3</title>
+	<meta charset="UTF-8">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/latest.js?config=AM_CHTML"></script>
+	<link href="data/round1/styles.css" type="text/css" rel="stylesheet" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+	<script src="./coms.js"></script>
+	<script>
+		var questions = [
+			{ pyt: "", A: "", B: "", C: "", D: "", odp: "", fif: "", img: "" },
+			{ pyt: "Jaka jest minimalna liczba sześciopaków, które trzeba zakupić, aby powiesić 99 butelek piwa 0% na ścianie?", A: "15", B: "17", C: "19", D: "21", odp: "B", fif: "AD", img: "" },
+			{ pyt: "Który znany matematyk w ostatnich latach swojego życia był przekonany, że jest inwigilowany przez sowieckie służby specjalne, mimo braku dowodów?", A: "Kurt Gödel", B: "Jeck Uryga", C: "Jack Fish", D: "John Nash", odp: "D", fif: "AB", img: "" },
+			{ pyt: "Światowy Dzień Pocałunku, Dzień Nikoli Tesli, Światowy Dzień Emocji oraz Dzień Aproksymacji Pi jest obchodzony:", A: "w lutym", B: "w kwietniu", C: "w lipcu", D: "w listopadzie", odp: "C", fif: "BD", img: "" },
+			{ pyt: "Znudzeni studenci matematyki wiedzą jaką liczbę wpisując na kalkulatorze można uzyskać liczbę „gigant”, <br>gdy się go odwróci do góry nogami:", A: "53507", B: "07734", C: "706006", D: "53045", odp: "C", fif: "BD", img: '' },
+			{ pyt: "W analizie matematycznej potoczna nazwa twierdzenia <br>„o trzech ciągach” to twierdzenie o:", A: "dwóch policjantach", B: "trzech muszkieterach", C: "czterech strażakach", D: "pięciu klerykach", odp: "A", fif: "BD", img: "" },
+			{ pyt: "Która cyfra jest kolejną po 3,14159… w liczbie  `\pi`?", A: "0", B: "2", C: "4", D: "7", odp: "B", fif: "CD", img: "" },
+			{ pyt: "Nazwa której funkcji trygonometrycznej znaczy „odcięcie” i pochodzi od łacińskiego słowa oznaczającego – „dzielić, rozcinać, rozstrzygać”?", A: "secans", B: "tangens", C: "sinus", D: "cosinus", odp: "A", fif: "CD", img: '' },
+			{ pyt: "W Warszawie przespacerujemy się ulicą Matematyczną, <br>a w którym z polskich miast przespacerujemy się ulicami: Logarytmiczna, Geometryczna, Liniowa, Algebraiczna bądź Pierwiastkowa?", A: "w Sosnowcu", B: "we Wrocławiu", C: "w Radomiu", D: "w Białymstoku", odp: "D", fif: "BC", img: '' },
+			{ pyt: "„Człowiek, który poznał nieskończoność” to dramat biograficzny z 2015 roku, przedstawiający historie prawdziwego matematyka, żyjącego na przełomie XIX <br>i XX wieku. Jak brzmi nazwisko tego matematyka?", A: "Riemann", B: "Cantor", C: "Ramanujan", D: "Perelman", odp: "C", fif: "AD", img: "" },
+			{ pyt: "Z czego wykonany jest Medal Sylvestera, przyznawany od 1901 roku wraz z nagrodą pieniężną w wysokości 1000 funtów przez brytyjskie Towarzystwo Królewskie <br>za osiągnięcia w dziedzinie matematyki?", A: "z brązu", B: "ze złota", C: "z mosiądzu", D: "ze srebra", odp: "A", fif: "BC", img: '' }
+		];
+
+		var numQ = 0;
+		var timer;
+		var locked = 0;
+		var phoneUsed = false;
+		var halfUsed = false;
+		var audUsed = false;
+		var revaled = [false, false, false, false];
+		var lost = false;
+		var addHelp = false;
+
+		function sleep(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
+		}
+
+		function ques() {
+			document.getElementsByTagName('p')[0].innerHTML = questions[numQ].pyt;
+			MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+		}
+
+		function reveal(ans) {
+			var pointer = document.getElementsByTagName('p')
+			switch (ans) {
+				case 1:
+					ques();
+					break;
+				case 2:
+					pointer[1].innerHTML = questions[numQ].A;
+					revaled[0] = true;
+					break;
+				case 3:
+					pointer[2].innerHTML = questions[numQ].B;
+					revaled[1] = true;
+					break;
+				case 4:
+					pointer[3].innerHTML = questions[numQ].C;
+					revaled[2] = true;
+					break;
+				case 5:
+					pointer[4].innerHTML = questions[numQ].D;
+					revaled[3] = true;
+					break;
+
+			}
+			MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+		}
+
+		function lockAnswer(ans) {
+
+			if (!revaled[ans - 2]) {
+				console.log('f');
+				reveal(ans);
+			}
+			else {
+				if (locked != 0) {
+					console.log('l');
+				}
+				else {
+					document.getElementsByTagName('text')[ans - 2].style.fill = "white";
+					document.getElementsByTagName('p')[ans - 1].style.color = "black";
+
+					document.getElementsByTagName('svg')[ans - 1].style.fill = "url(#yellow)";
+					locked = ans - 1;
+					clearInterval(timer);
+					document.getElementById('easyMusic').pause();
+					document.getElementById('mediumMusic').pause();
+					document.getElementById('hardMusic').pause();
+					document.getElementById('finalMusic').pause();
+					document.getElementById('finalAnswer').currentTime = 0;
+					document.getElementById('finalAnswer').play();
+				}
+			}
+		}
+		function odpToNr() {
+			if (questions[numQ].odp == 'A') return 1;
+			else if (questions[numQ].odp == 'B') return 2;
+			else if (questions[numQ].odp == 'C') return 3;
+			else if (questions[numQ].odp == 'D') return 4;
+		}
+
+		async function checkAnswer() {
+			document.getElementById('finalAnswer').pause();
+			if (odpToNr() == locked) {
+				if (numQ == 10) {
+					document.getElementById('winMillion').currentTime = 0;
+					document.getElementById('winMillion').play();
+				} else {
+					document.getElementById('win').currentTime = 0;
+					document.getElementById('win').play();
+				}
+				document.getElementsByTagName('svg')[locked].style.fill = "url(#green)";
+				document.getElementsByTagName('text')[odpToNr() - 1].style.fill = "white";
+				document.getElementsByTagName('p')[odpToNr()].removeAttribute("style");
+			}
+			else {
+				document.getElementsByTagName('svg')[odpToNr()].style.fill = "url(#green)";
+				document.getElementsByTagName('text')[odpToNr() - 1].style.fill = "white";
+				document.getElementById('lose').currentTime = 0;
+				document.getElementById('lose').play();
+				lost = true;
+			}
+		}
+		function music() {
+			if (numQ == 1) {
+				document.getElementById('letsPlay').currentTime = 0;
+				document.getElementById('letsPlay').play();
+				setTimeout(function () {
+					document.getElementById('easyMusic').currentTime = 0;
+					document.getElementById('easyMusic').play();
+					document.getElementById('easyMusic').loop = true;
+				}, 3000);
+			} else if (numQ <= 2) {
+				document.getElementById('easyMusic').currentTime = 0;
+				document.getElementById('easyMusic').play();
+				document.getElementById('easyMusic').loop = true;
+			} else if (numQ >= 3 && numQ <= 6) {
+				document.getElementById('mediumMusic').currentTime = 0;
+				document.getElementById('mediumMusic').play();
+				document.getElementById('mediumMusic').loop = true;
+			} else if (numQ >= 7 && numQ <= 9) {
+				document.getElementById('hardMusic').currentTime = 0;
+				document.getElementById('hardMusic').play();
+				document.getElementById('hardMusic').loop = true;
+			} else if (numQ == 10) {
+				document.getElementById('finalMusic').currentTime = 0;
+				document.getElementById('finalMusic').play();
+				document.getElementById('finalMusic').loop = true;
+			}
+		}
+		function reset() {
+			var i;
+			for (i = 2; i < 6; i++) {
+				document.getElementsByTagName('svg')[i - 1].style.removeProperty("fill");
+				document.getElementsByTagName('text')[i - 2].style.removeProperty("fill");
+				document.getElementsByTagName('p')[i - 1].innerHTML = "";
+				revaled[i - 2] = false;
+				document.getElementsByClassName("answer")[i - 2].style.removeProperty("opacity");
+
+			}
+			document.getElementsByTagName('p')[0].innerHTML = "";
+			document.getElementById('timer').setAttribute("style", "opacity:0.0");
+			document.getElementById('stats').setAttribute("style", "display:none");
+			locked = 0;
+
+		}
+		function nextQuestion() {
+			if (numQ == 10 || lost) window.location.href = "index.html";
+			if (numQ == 8) {
+				addHelp = true;
+				if (audUsed) {
+					document.getElementById("aud").setAttribute("style", 'background-image: url("images/audH.png");');
+				}
+			}
+			if (numQ != 0) document.getElementsByClassName('value')[(10 - numQ)].style.removeProperty('fill-opacity');
+			numQ = numQ + 1;
+			document.getElementsByClassName('value')[(10 - numQ)].style.setProperty('fill-opacity', 1);
+			reset();
+			music();
+		}
+		function previousQuestion() {
+			if (numQ == 0) return;
+			document.getElementsByClassName('value')[(10 - numQ)].style.removeProperty('fill-opacity');
+			numQ = numQ - 1;
+			if (numQ != 0) { document.getElementsByClassName('value')[(10 - numQ)].style.setProperty('fill-opacity', 1); }
+			reset();
+			music();
+		}
+		function charToNr(char) {
+			if (char == 'A') return 0;
+			else if (char == 'B') return 1;
+			else if (char == 'C') return 2;
+			else if (char == 'D') return 3;
+		}
+		const TIME_LIMIT = 30;
+		const ATIME_LIMIT = 15;
+		let AtimePassed = 0;
+		let AtimeLeft = ATIME_LIMIT;
+		let AtimerInterval = null;
+
+		function audienceLifeSever() {
+			AtimePassed = 0; if (!audUsed || addHelp) {
+				openVoting();
+				if (audUsed) {
+					addHelp = false
+					document.getElementById("aud").setAttribute("style", 'background-image: url("images/audr.png");');
+				}
+				else if (addHelp) {
+					addHelp = false
+					document.getElementById("aud").setAttribute("style", 'background-image: url("images/audH.png");');
+				}
+				else {
+					audUsed = true;
+					document.getElementById("aud").setAttribute("style", 'background-image: url("images/audr.png");');
+				}
+
+				let full;
+				let percent = []
+
+				AtimePassed = 0;
+				AtimeLeft = ATIME_LIMIT
+				AtimerInterval = null
+				
+				document.getElementsByClassName("char")[0].innerHTML = "A";
+				document.getElementsByClassName("char")[1].innerHTML = "B";
+				document.getElementsByClassName("char")[2].innerHTML = "C";
+				document.getElementsByClassName("char")[3].innerHTML = "D";
+
+				document.getElementById("stats").setAttribute("style", "display:block;");
+				AtimerInterval = setInterval(() => {
+					AtimePassed = AtimePassed += 1;
+					AtimeLeft = ATIME_LIMIT - AtimePassed;
+
+
+
+
+					document.getElementsByClassName("statValue")[0].setAttribute("style", "height:" + Math.round(Math.random() * 100) + "%;");
+					document.getElementsByClassName("statValue")[1].setAttribute("style", "height:" + Math.round(Math.random() * 100) + "%;");
+					document.getElementsByClassName("statValue")[2].setAttribute("style", "height:" + Math.round(Math.random() * 100) + "%;");
+					document.getElementsByClassName("statValue")[3].setAttribute("style", "height:" + Math.round(Math.random() * 100) + "%;");
+					if (AtimeLeft === 0) {
+						clearInterval(AtimerInterval);
+						closeVoting();
+
+						$.ajax({
+							url: 'https://api.raxtus.net/vote',
+							type: 'GET',
+							success: function (result) {
+								console.log(result)
+								state = result;
+								full = state.answers.a + state.answers.b + state.answers.c + state.answers.d;
+								percent.push(Math.round((state.answers.a / full) * 100));
+								percent.push(Math.round((state.answers.b / full) * 100));
+								percent.push(Math.round((state.answers.c / full) * 100));
+								percent.push(Math.round((state.answers.d / full) * 100));
+
+								document.getElementsByClassName("statValue")[0].setAttribute("style", "height:" + percent[0] + "%;");
+								document.getElementsByClassName("char")[0].innerHTML = "A</br>" + percent[0] + "%";
+								document.getElementsByClassName("statValue")[1].setAttribute("style", "height:" + percent[1] + "%;");
+								document.getElementsByClassName("char")[1].innerHTML = "B</br>" + percent[1] + "%";
+								document.getElementsByClassName("statValue")[2].setAttribute("style", "height:" + percent[2] + "%;");
+								document.getElementsByClassName("char")[2].innerHTML = "C</br>" + percent[2] + "%";
+								document.getElementsByClassName("statValue")[3].setAttribute("style", "height:" + percent[3] + "%;");
+								document.getElementsByClassName("char")[3].innerHTML = "D</br>" + percent[3] + "%";
+							}
+							, error: function (error) {
+
+								console.log(error)
+							}
+						});
+
+
+					};
+				}
+					, 500);
+			}
+		}
+
+		function fiftyLifesaver() {
+			if (!halfUsed) {
+				halfUsed = true;
+				document.getElementById("half").setAttribute("style", 'background-image: url("images/50_50r.png");');;
+				var st = questions[numQ].fif;
+				var ch = "";
+				ch = st.charAt(0);
+				document.getElementsByClassName("answer")[charToNr(ch)].setAttribute("style", "opacity:0.0;");
+				ch = st.charAt(1);
+				document.getElementsByClassName("answer")[charToNr(ch)].setAttribute("style", "opacity:0.0;");
+
+			}
+
+		}
+
+		function phoneLifesaver() {
+			if (!phoneUsed) {
+				document.getElementById("call").setAttribute("style", 'background-image: url("images/Phoner.png");');
+				startTimer();
+				phoneUsed = true;
+			} else {
+				document.getElementById("timer").style.opacity = "0.0";
+				clearInterval(timer);
+			}
+		}
+
+		const FULL_DASH_ARRAY = 283;
+		const WARNING_THRESHOLD = 10;
+		const ALERT_THRESHOLD = 5;
+
+		const COLOR_CODES = {
+			info: {
+				color: "green"
+			},
+			warning: {
+				color: "orange",
+				threshold: WARNING_THRESHOLD
+			},
+			alert: {
+				color: "red",
+				threshold: ALERT_THRESHOLD
+			}
+		};
+
+
+		let timePassed = 0;
+		let timeLeft = TIME_LIMIT;
+		let timerInterval = null;
+		let remainingPathColor = COLOR_CODES.info.color;
+
+		function prepareTimer() {
+			document.getElementById("timer").innerHTML = `
+			<div class="base-timer">
+			<svg class="base-timer__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+				<g class="base-timer__circle">
+				<circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
+				<path
+					id="base-timer-path-remaining"
+					stroke-dasharray="283"
+					class="base-timer__path-remaining ${remainingPathColor}"
+					d="
+					M 50, 50
+					m -45, 0
+					a 45,45 0 1,0 90,0
+					a 45,45 0 1,0 -90,0
+					"
+				></path>
+				</g>
+			</svg>
+			<span id="base-timer-label" class="base-timer__label">${formatTime(
+				timeLeft
+			)}</span>
+			</div>
+			`;
+		}
+
+		function onTimesUp() {
+			clearInterval(timerInterval);
+
+		}
+
+		function startTimer() {
+			prepareTimer();
+			document.getElementById("timer").setAttribute("style", "opacity:1.0")
+			timerInterval = setInterval(() => {
+				timePassed = timePassed += 1;
+				timeLeft = TIME_LIMIT - timePassed;
+				document.getElementById("base-timer-label").innerHTML = formatTime(
+					timeLeft
+				);
+				setCircleDasharray();
+				setRemainingPathColor(timeLeft);
+
+				if (timeLeft === 0) {
+					onTimesUp();
+				}
+			}, 1000);
+		}
+
+		function formatTime(time) {
+			const minutes = Math.floor(time / 60);
+			let seconds = time % 60;
+
+			if (seconds < 10) {
+				seconds = `0${seconds}`;
+			}
+
+			return `${minutes}:${seconds}`;
+		}
+
+		function setRemainingPathColor(timeLeft) {
+			const { alert, warning, info } = COLOR_CODES;
+			if (timeLeft <= alert.threshold) {
+				document
+					.getElementById("base-timer-path-remaining")
+					.classList.remove(warning.color);
+				document
+					.getElementById("base-timer-path-remaining")
+					.classList.add(alert.color);
+			} else if (timeLeft <= warning.threshold) {
+				document
+					.getElementById("base-timer-path-remaining")
+					.classList.remove(info.color);
+				document
+					.getElementById("base-timer-path-remaining")
+					.classList.add(warning.color);
+			}
+		}
+
+		function calculateTimeFraction() {
+			const rawTimeFraction = timeLeft / TIME_LIMIT;
+			return rawTimeFraction - (1 / TIME_LIMIT) * (1 - rawTimeFraction);
+		}
+
+		function setCircleDasharray() {
+			const circleDasharray = `${(
+				calculateTimeFraction() * FULL_DASH_ARRAY
+			).toFixed(0)} 283`;
+			document
+				.getElementById("base-timer-path-remaining")
+				.setAttribute("stroke-dasharray", circleDasharray);
+		}
+
+		document.onkeydown = checkKey;
+
+		function checkKey(e) {
+			e = e || window.event;
+
+			if (e.keyCode == '37') {
+				// left arrow
+				previousQuestion();
+				console.log(numQ);
+			}
+			else if (e.keyCode == '39') {
+				// right arrow
+				nextQuestion();
+				console.log(numQ);
+			}
+			else if (e.keyCode == '81') {
+				//q
+				ques();
+				console.log('q');
+			}
+			else if (e.keyCode == '87') {
+				//w
+				reveal();
+				console.log('reveal');
+			}
+			else if (e.keyCode == '67') {
+				//c
+				checkAnswer();
+			}
+			else if (e.keyCode == '49') {
+				//1
+				lockAnswer(2)
+			}
+			else if (e.keyCode == '50') {
+				//2
+				lockAnswer(3)
+			}
+			else if (e.keyCode == '51') {
+				//3
+				lockAnswer(4)
+			}
+			else if (e.keyCode == '52') {
+				//4
+				lockAnswer(5)
+			}
+			else if (e.keyCode == '65') {
+				//a
+				audienceLifeSever();
+			}
+			else if (e.keyCode == '83') {
+				//s
+				fiftyLifesaver();
+			}
+			else if (e.keyCode == '68') {
+				//d
+				phoneLifesaver();
+			}
+
+		}
+
+	</script>
+</head>
+
+<body>
+	<!-- Timer -->
+
+	<!-- Question Area -->
+	<div id="questionArea">
+		<!-- Question -->
+
+		<div id="questionBox" onclick="reveal(1)">
+			<svg width="100%" height="100%" viewBox="0 0 1680 280">
+				<use xlink:href="#buttonSVG"></use>
+			</svg>
+			<p id="qText"> </p>
+		</div>
+
+		<!-- Answers -->
+		<div id="answerA" class="answer" onclick="lockAnswer(2)">
+			<svg width="100%" height="100%" viewBox="0 0 1680 280">
+				<use xlink:href="#buttonSVG"></use>
+				<text x="130" y="180">A:</text>
+			</svg>
+			<p>
+			</p>
+		</div>
+
+		<div id="answerB" class="answer" onclick="lockAnswer(3)">
+			<svg width="100%" height="100%" viewBox="0 0 1680 280">
+				<use xlink:href="#buttonSVG"></use>
+				<text x="130" y="180">B:</text>
+			</svg>
+			<p>
+			</p>
+		</div>
+
+		<div id="answerC" class="answer" onclick="lockAnswer(4)">
+			<svg width="100%" height="100%" viewBox="0 0 1680 280">
+				<use xlink:href="#buttonSVG"></use>
+				<text x="130" y="180">C:</text>
+			</svg>
+			<p>
+			</p>
+		</div>
+
+		<div id="answerD" class="answer" onclick="lockAnswer(5)">
+			<svg width="100%" height="100%" viewBox="0 0 1680 280">
+				<use xlink:href="#buttonSVG"></use>
+				<text x="130" y="180">D:</text>
+			</svg>
+			<p>
+			</p>
+		</div>
+
+	</div>
+	<!-- CheckAnswer -->
+	<div id="right">
+		<div id="help">
+			<div id="aud" onclick="audienceLifeSever()">
+
+			</div>
+			<div id="half" onclick="fiftyLifesaver()">
+
+			</div>
+			<div id="call" onclick="phoneLifesaver()">
+
+			</div>
+
+		</div>
+		<div id="values">
+			<svg viewBox="0 0 600 100">
+				<use class="value" xlink:href="#marker"></use>
+				<text x="50" y="55">10 </text>
+				<text x="300" y="55">6 (waga 4)</text>
+			</svg>
+			<svg viewBox="0 0 600 100">
+				<use class="value" xlink:href="#marker"></use>
+				<text x="50" y="55">9</text>
+				<text x="300" y="55">6 (waga 3)</text>
+			</svg>
+			<svg viewBox="0 0 600 100">
+				<use class="value" xlink:href="#marker"></use>
+				<text x="50" y="55" style="fill:white">8</text>
+				<text x="300" y="55" style="fill:white">+ koło</text>
+			</svg>
+			<svg viewBox="0 0 600 100">
+				<use class="value" xlink:href="#marker"></use>
+				<text x="50" y="55">7</text>
+				<text x="300" y="55">6 (waga 2)</text>
+			</svg>
+			<svg viewBox="0 0 600 100">
+				<use class="value" xlink:href="#marker"></use>
+				<text x="50" y="55">6</text>
+				<text x="300" y="55">6 (waga 1)</text>
+			</svg>
+			<svg viewBox="0 0 600 100">
+				<use class="value" xlink:href="#marker"></use>
+				<text x="50" y="55" style="fill:white">5</text>
+				<text x="300" y="55" style="fill:white">+ książka</text>
+			</svg>
+			<svg viewBox="0 0 600 100">
+				<use class="value" xlink:href="#marker"></use>
+				<text x="50" y="55">4</text>
+				<text x="300" y="55">5 (waga 3)</text>
+			</svg>
+			<svg viewBox="0 0 600 100">
+				<use class="value" xlink:href="#marker"></use>
+				<text x="50" y="55">3</text>
+				<text x="300" y="55">5 (waga 2)</text>
+			</svg>
+			<svg viewBox="0 0 600 100">
+				<use class="value" xlink:href="#marker"></use>
+				<text x="50" y="55" style="fill:white">2</text>
+				<text x="300" y="55" style="fill:white">+ kubek</text>
+			</svg>
+			<svg viewBox="0 0 600 100">
+				<use class="value" xlink:href="#marker"></use>
+				<text x="50" y="50">1</text>
+				<text x="300" y="55">5 (waga 1)</text>
+			</svg>
+		</div>
+	</div>
+
+	<div id="stats">
+		<div class="statBox">
+			<div class="box">
+				<div class="statValue"></div>
+			</div>
+			<div class="char">A</div>
+		</div>
+		<div class="statBox">
+			<div class="box">
+				<div class="statValue"></div>
+			</div>
+			<div class="char">B</div>
+		</div>
+		<div class="statBox">
+			<div class="box">
+				<div class="statValue"></div>
+			</div>
+			<div class="char">C</div>
+		</div>
+		<div class="statBox">
+			<div class="box">
+				<div class="statValue"></div>
+			</div>
+			<div class="char">D</div>
+		</div>
+	</div>
+
+	<div id="timer">
+
+	</div>
+	<!-- Music -->
+
+	<audio id="easyMusic" style="display:hidden;visibility:none;">
+		<source src="music/easyMusic.mp3" type="audio/mpeg">
+	</audio>
+
+	<audio id="mediumMusic" style="display:hidden;visibility:none;">
+		<source src="music/mediumMusic.mp3" type="audio/mpeg">
+	</audio>
+
+	<audio id="hardMusic" style="display:hidden;visibility:none;">
+		<source src="music/hardMusic.mp3" type="audio/mpeg">
+	</audio>
+
+	<audio id="hardMusic" style="display:hidden;visibility:none;">
+		<source src="music/hardMusic.mp3" type="audio/mpeg">
+	</audio>
+
+	<audio id="finalMusic" style="display:hidden;visibility:none;">
+		<source src="music/finalMusic.mp3" type="audio/mpeg">
+	</audio>
+
+	<audio id="finalAnswer" style="display:hidden;visibility:none;">
+		<source src="music/finalAnswer.mp3" type="audio/mpeg">
+	</audio>
+
+	<audio id="letsPlay" style="display:hidden;visibility:none;">
+		<source src="music/letsPlay.mp3" type="audio/mpeg">
+	</audio>
+
+	<audio id="win" style="display:hidden;visibility:none;">
+		<source src="music/win.mp3" type="audio/mpeg">
+	</audio>
+
+	<audio id="winMillion" style="display:hidden;visibility:none;">
+		<source src="music/winMillion.mp3" type="audio/mpeg">
+	</audio>
+
+	<audio id="lose" style="display:hidden;visibility:none;">
+		<source src="music/lose.mp3" type="audio/mpeg">
+	</audio>
+
+	<svg width="0" height="0" style="position:absolute;">
+		<defs id="defs2">
+			<linearGradient id="blue">
+				<stop style="stop-color:#0859a0;stop-opacity:1" offset="0" id="stop5241" />
+				<stop style="stop-color:#063273;stop-opacity:1" offset="1" id="stop5243" />
+			</linearGradient>
+			<linearGradient id="yellow">
+				<stop style="stop-color:#eeaa34;stop-opacity:1" offset="0" id="stop5241" />
+				<stop style="stop-color:#c49a2f;stop-opacity:1" offset="1" id="stop5243" />
+			</linearGradient>
+			<linearGradient id="green">
+				<stop style="stop-color:#c2ff0a;stop-opacity:1" offset="0" id="stop5241" />
+				<stop style="stop-color:#6bbc0a;stop-opacity:1" offset="1" id="stop5243" />
+			</linearGradient>
+			<linearGradient id="gray">
+				<stop style="stop-color:#cccccc;stop-opacity:1" offset="0" id="stop1902" />
+				<stop style="stop-color:#414141;stop-opacity:1" offset="1" id="stop1904" />
+			</linearGradient>
+
+			<filter id='shadow' color-interpolation-filters="sRGB">
+				<feDropShadow dx="3" dy="3" stdDeviation="4" flood-opacity="1" />
+			</filter>
+		</defs>
+		<polygon id="buttonSVG" points="20 140, 160 20, 1520 20, 1660 140, 1520 260, 160 260"
+			style="stroke:url(#gray);stroke-width:10" />
+		<polygon id="marker" points="5 50, 40 95,560 95, 595 50, 560 5, 40 5" />
+	</svg>
+
+</body>
+
+</html>

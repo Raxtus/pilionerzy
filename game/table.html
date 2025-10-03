@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Elimin Picked</title>
+
+    <svg width="0" height="0">
+        <defs id="defs2">
+            <linearGradient id="blue">
+                <stop style="stop-color:#0859a0;stop-opacity:1" offset="0" id="stop5241" />
+                <stop style="stop-color:#063273;stop-opacity:1" offset="1" id="stop5243" />
+            </linearGradient>
+            <linearGradient id="yellow">
+                <stop style="stop-color:#eeaa34;stop-opacity:1" offset="0" id="stop5241" />
+                <stop style="stop-color:#c49a2f;stop-opacity:1" offset="1" id="stop5243" />
+            </linearGradient>
+            <linearGradient id="green">
+                <stop style="stop-color:#c2ff0a;stop-opacity:1" offset="0" id="stop5241" />
+                <stop style="stop-color:#6bbc0a;stop-opacity:1" offset="1" id="stop5243" />
+            </linearGradient>
+            <linearGradient id="gray">
+                <stop style="stop-color:#cccccc;stop-opacity:1" offset="0" id="stop1902" />
+                <stop style="stop-color:#414141;stop-opacity:1" offset="1" id="stop1904" />
+            </linearGradient>
+
+        </defs>
+
+        <filter id='shadow' color-interpolation-filters="sRGB">
+			<feDropShadow dx="3" dy="3" stdDeviation="4" flood-opacity="1" />
+		</filter>
+        
+        <polygon id="buttonSVG" points="5 50, 40 95,760 95, 795 50, 760 5, 40 5"
+            style="stroke:url(#gray);stroke-width:5" />
+    </svg>
+
+    <link href="data/table/style.css" type="text/css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="./coms.js"></script>
+    <script>
+
+        var correct;
+        var time;
+        function printResults(result) {
+            let person = [];
+            let pSVG = [];
+            let useSVG = [];
+            let textN = [];
+            let textD = [];
+
+            var found = false;
+
+            correct = result[0].ans;
+            time = result[0].time;
+
+            for (i = 0; i < result.length - 1; i++) {
+                person.push(document.createElement("div"))
+                pSVG.push(document.createElementNS('http://www.w3.org/2000/svg', "svg"));
+                useSVG.push(document.createElementNS('http://www.w3.org/2000/svg', "use"));
+                textN.push(document.createElementNS('http://www.w3.org/2000/svg', "text"));
+                textD.push(document.createElementNS('http://www.w3.org/2000/svg', "text"));
+
+                document.body.appendChild(person[i]);
+                person[i].appendChild(pSVG[i]);
+                pSVG[i].appendChild(useSVG[i]);
+                pSVG[i].appendChild(textN[i]);
+                pSVG[i].appendChild(textD[i]);
+
+
+
+                person[i].setAttribute("class", "person");
+                pSVG[i].setAttributeNS('http://www.w3.org/1999/xlink', "viewBox", "0 0 800 100");
+                useSVG[i].setAttributeNS('http://www.w3.org/1999/xlink', "xlink:href", "#buttonSVG")
+                textN[i].setAttribute("x", "50");
+                textN[i].setAttribute("y", "55");
+                textN[i].innerHTML = result[i + 1].name;
+                textD[i].setAttribute("x", "50");
+                textD[i].setAttribute("y", "55");
+
+
+                if (!found) {
+                    if (result[i + 1].ans.toUpperCase() == correct) {
+                        pSVG[i].setAttribute("id", "best");
+                        found = true;
+                        //time na razie pomijamy
+                    }
+
+                }
+                if (result[i + 1].ans.toUpperCase() == correct) {
+                    pSVG[i].setAttribute("class", "correct");
+                }
+            }
+
+        }
+
+        function getEliminations() {
+            $.ajax({
+                url: 'https://api.raxtus.net/eliminations',
+                type: 'GET',
+                success: function (result) {
+                    //Tutaj zwraca JSON'a z wynikami eliminacji
+                    printResults(result);
+                    deleteEliminations();
+
+                    //console.log(data)
+                }, error: function (error) {
+
+                    console.log(error)
+                }
+            });
+
+        }
+
+        document.onkeydown = checkKey;
+
+	function checkKey(e) {
+    e = e || window.event;
+
+    if (e.keyCode == '81') {
+       // q
+	   document.getElementById("best").setAttribute("style","fill:url(#green);");
+    }
+    else if (e.keyCode == '37') {
+       // left arrow
+       window.location.href = "index.html";
+
+    }
+    }
+
+    </script>
+
+
+</head>
+
+<body onload="getEliminations()">
+
+    <audio id="right" style="display:hidden;visibility:none;">
+        <source src="music/correct.mp3" type="audio/mpeg">
+    </audio>
+
+
+</body>
+
+</html>
